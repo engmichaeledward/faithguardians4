@@ -6,7 +6,7 @@
 <title>Faith Guardians — حُراس الإيمان</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--gold:#e8b64c;--gold2:#f7d98c;--parch:#f6ead0;--ink:#3b2a18;--green:#2f9e63;--red:#c04434}
+:root{--gold:#e8b64c;--gold2:#f7d98c;--ink:#3b2a18;--green:#2f9e63;--red:#c04434}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:#1a1206;font-family:'Cairo','Segoe UI',Tahoma,sans-serif;touch-action:none;user-select:none;-webkit-user-select:none}
 canvas#game{position:fixed;inset:0;display:block;touch-action:none}
@@ -30,17 +30,20 @@ button{font-family:inherit;cursor:pointer;border:none}
   border:1px solid rgba(232,182,76,.45);border-radius:14px;padding:6px 12px;color:#ffe9b8;font-size:13px}
 #mute{position:absolute;bottom:calc(14px + env(safe-area-inset-bottom));right:12px;width:46px;height:46px;border-radius:50%;
   background:rgba(26,16,4,.6);border:1px solid rgba(232,182,76,.5);color:#ffe9b8;font-size:20px;pointer-events:auto}
+#walkBtn{position:fixed;bottom:calc(76px + env(safe-area-inset-bottom));right:12px;width:66px;height:66px;border-radius:50%;
+  background:rgba(26,16,4,.65);border:2px solid rgba(232,182,76,.6);color:#ffe9b8;font-size:13px;font-weight:900;z-index:8;line-height:1.15;display:none}
+#walkBtn.on{background:rgba(47,110,70,.8);border-color:#9fe0b0}
 
-#stick{position:fixed;width:120px;height:120px;border-radius:50%;background:rgba(255,240,200,.10);
-  border:2px solid rgba(255,240,200,.4);z-index:8;pointer-events:none;left:22px;bottom:calc(26px + env(safe-area-inset-bottom))}
-#nub{position:absolute;left:50%;top:50%;width:52px;height:52px;border-radius:50%;transform:translate(-50%,-50%);
+#stick{position:fixed;width:140px;height:140px;border-radius:50%;background:rgba(255,240,200,.10);
+  border:2px solid rgba(255,240,200,.4);z-index:8;pointer-events:none;left:20px;bottom:calc(24px + env(safe-area-inset-bottom))}
+#nub{position:absolute;left:50%;top:50%;width:60px;height:60px;border-radius:50%;transform:translate(-50%,-50%);
   background:radial-gradient(circle at 35% 30%,#ffe9b8,#c9973b);box-shadow:0 4px 12px rgba(0,0,0,.4)}
-#stickLbl{position:absolute;left:50%;top:-24px;transform:translateX(-50%);color:#ffe9b8;font-size:12px;white-space:nowrap;
+#stickLbl{position:absolute;left:50%;top:-26px;transform:translateX(-50%);color:#ffe9b8;font-size:12px;white-space:nowrap;
   text-shadow:0 1px 3px #000;animation:pulse 1.6s infinite}
 @keyframes pulse{50%{opacity:.4}}
-#hint{position:fixed;bottom:22vh;left:50%;transform:translateX(-50%);background:rgba(26,16,4,.75);color:#ffe9b8;
+#hint{position:fixed;bottom:24vh;left:50%;transform:translateX(-50%);background:rgba(26,16,4,.78);color:#ffe9b8;
   padding:10px 20px;border-radius:30px;border:1px solid rgba(232,182,76,.5);z-index:6;font-size:14px;text-align:center;
-  transition:opacity 1s;pointer-events:none}
+  transition:opacity 1s;pointer-events:none;max-width:92vw}
 
 .ov{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px;
   background:radial-gradient(ellipse at center,rgba(30,18,4,.45),rgba(10,6,1,.82))}
@@ -72,6 +75,10 @@ button{font-family:inherit;cursor:pointer;border:none}
 @keyframes shake{25%{transform:translateX(6px)}75%{transform:translateX(-6px)}}
 .why{background:#f3e6c4;border:2px dashed #b98a2e;border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.9;margin-top:12px}
 .why b{color:#8a5a10}
+.chars{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0}
+.chip{border-radius:12px;padding:6px 12px;font-size:13px;font-weight:700;border:2px solid;line-height:1.6}
+.chip.her{background:#f3e2e2;border-color:#a05050;color:#6e2a2a}
+.chip.def{background:#e2efdf;border-color:#4d8a4d;color:#2c5c2c}
 #toast{position:fixed;top:calc(120px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:15;
   background:rgba(30,20,4,.85);color:#ffe9b8;border:1px solid var(--gold);border-radius:30px;padding:10px 26px;
   font-size:15px;font-weight:700;opacity:0;transition:.5s;pointer-events:none;text-align:center;max-width:88vw}
@@ -90,20 +97,21 @@ button{font-family:inherit;cursor:pointer;border:none}
   <div id="starHud">⭐ <span id="starN">0</span>/18</div>
   <button id="mute">🔊</button>
 </div>
-<div id="stick"><div id="stickLbl">اسحب هنا لفوق ⬆</div><div id="nub"></div></div>
-<div id="hint" class="hidden">اسحب الدايرة (تحت الشمال) لفوق عشان تمشي ⬆️ — أو المس أي مكان في الشاشة واسحبي</div>
+<button id="walkBtn">🚶<br>ماشي</button>
+<div id="stick"><div id="stickLbl">اسحب هنا ⬆</div><div id="nub"></div></div>
+<div id="hint" class="hidden"></div>
 <div id="toast"></div>
 
 <div id="title" class="ov">
   <div class="card">
     <div class="cross">✛</div>
     <h1>Faith Guardians<br>حُراس الإيمان</h1>
-    <p>رحلة على طريق الكنيسة القديم: ٣ بوابات بتسأل عن الإيمان، و٣ صخور انقسام…
-وأنتِ/أنت هتكملوا الطريق وتحفظوا الوديعة. 🕯️</p>
+    <p>رحلة على طريق الإيمان المستقيم: ٣ بوابات للهرطقات، و٣ صخور انقسامات…
+وأنت هتكمل الطريق وتحفظ الوديعة. 🕯️</p>
     <button class="btn" id="btnStart">▶ ابدأ الرحلة</button>
-    <div class="tiny">لمرحلة الثانوي والشباب — كنيسة العذراء والأنبا أثناسيوس، مدينة نصر<br>
+    <div class="tiny">كنيسة العذراء والأنبا أثناسيوس، مدينة نصر — مرحلة الثانوي<br>
     «رب واحد، إيمان واحد، معمودية واحدة» (أف 4: 5)<br>
-    🎮 الموبايل: اسحب بإصبعك في أي مكان على الشاشة • الكمبيوتر: الأسهم أو WASD</div>
+    🎮 الموبايل: مشي تلقائي + اسحب للتوجيه • الكمبيوتر: الأسهم أو WASD</div>
   </div>
 </div>
 
@@ -120,6 +128,7 @@ button{font-family:inherit;cursor:pointer;border:none}
   <div class="card">
     <div class="ribbon" id="qzYear"></div>
     <h2 id="qzName"></h2>
+    <div id="qzChars" class="chars"></div>
     <div class="dots" id="qzDots"></div>
     <div id="qzIntro">
       <p id="qzIntroTxt"></p>
@@ -154,11 +163,16 @@ button{font-family:inherit;cursor:pointer;border:none}
 
 <script>
 'use strict';
-/* Faith Guardians — حُرّاس الإيمان (v1.1 — fixed camera index crash + touch controls) */
+/* Faith Guardians — حُرّاس الإيمان  v1.2
+   paved ancient road • heretic/defender figures • real fork roads • mobile fixes */
+
+const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
 
 /* ---------------- Data ---------------- */
 const MILESTONES=[
 {type:'gate',year:'325م',name:'مجمع نيقية',
+ her:'أريوس — «المسيسب ليس إلهاً حقيقياً»'.replace('المسيح ليس','المسيح ليس'),
+ def:'البابا ألكسندروس والقديس أثناسيوس الرسولي',
  intro:'الذراع نازل والطريق واقف. السؤال: مَن هو المسيح؟ هل هو الله بالحقيقة أم مجرد كائن عظيم؟\nأريوس قال: «المسيح ليس إلهاً حقيقياً».\n⚠️ الخطر مش خلاف لفظي: لو المسيح مش إله، الخلاص نفسه يهتز!',
  qs:[
  {q:'الخلاف كان مع مين؟',o:['أريوس','نسطور','مقدونيوس','القديس كيرلس'],a:0,w:'أريوس هو اللي قال إن المسيح مش إله حقيقي، فقامت أول بوابة في الطريق.'},
@@ -167,6 +181,8 @@ const MILESTONES=[
  {q:'إيه نتيجة المجمع؟',o:['صياغة الجزء الأول من قانون الإيمان وتثبيت ألوهية الابن','انقسام الكنيسة','إلغاء المعمودية','بناء مدينة جديدة'],a:0,w:'نيقية ثبّتت ألوهية الابن وكتبت أول جزء من قانون الإيمان.'}],
  open:'الذراع اترفع! ألوهية الابن ثابتة… الطريق يكمّل ✨'},
 {type:'gate',year:'381م',name:'مجمع القسطنطينية',
+ her:'مقدونيوس — أنكر لاهوت الروح القدس',
+ def:'القديس غريغوريوس اللاهوتي',
  intro:'بعد نيقية الطريق ما انتهى؛ ظهر سؤال جديد: مَن هو الروح القدس؟\nهل هو الله العامل في الكنيسة، أم مجرد قوة أو مخلوق؟\nمقدونيوس أنكر لاهوت الروح القدس.',
  qs:[
  {q:'الخلاف كان مع مين؟',o:['مقدونيوس','أريوس','نسطور','أبوليناريوس'],a:0,w:'مقدونيوس أنكر لاهوت الروح القدس.'},
@@ -175,6 +191,8 @@ const MILESTONES=[
  {q:'إيه النتيجة؟',o:['استكمال قانون الإيمان وتأكيد لاهوت الروح القدس','بداية الانشقاق العظيم','إلغاء القداسات','تغيير المعمودية'],a:0,w:'القسطنطينية كمّلت قانون الإيمان وثبّتت لاهوت الروح القدس.'}],
  open:'«الرب المحيي» — لاهوته ثابت. قانون الإيمان اكتمل… كمّل الطريق!'},
 {type:'gate',year:'431م',name:'مجمع أفسس',
+ her:'نسطور — «المسيح شخصان، والعذراء ليست والدة الإله»',
+ def:'القديس كيرلس الكبير عمود الدين',
  intro:'السؤال هنا عن المسيح المتجسد: هل هو شخص واحد، أم كأن فيه شخصين منفصلين؟\nوهل نقدر نقول عن العذراء إنها والدة الإله؟\nنسطور قال: «المسيح شخصان، والعذراء ليست والدة الإله».',
  qs:[
  {q:'الخلاف كان مع مين؟',o:['مقدونيوس','نسطور','أريوس','مقدونيوس وأريوس معاً'],a:1,w:'نسطور فصل المسيح لشخصين وأنكر لقب والدة الإله.'},
@@ -190,61 +208,87 @@ const MILESTONES=[
  {q:'الفرع الخلقيدوني ضم مين؟',o:['روما والقسطنطينية','الإسكندرية وأنطاكية','أرمينيا وإثيوبيا','الهند'],a:0,w:'من جانب الصخرة خرج الفرع الخلقيدوني: روما والقسطنطينية.'},
  {q:'إزاي نتكلم عن الانقسام ده؟',o:['نقول إن الكل أشرار','نتكلم بمحبة واحترام: حدث انقسام تاريخي ولاهوتي، ونفهم فين استمرت كنيستنا','نتجاهله خالص','نسخر من أي حد مختلف'],a:1,w:'الهدف تعليمي مش هجومي: محبة حقيقية مع أمانة للإيمان.'}],
  fork:{branch:'الفرع الخلقيدوني (روما والقسطنطينية)',
- msg:'الطريق اتقسم 🪨\nفرع خلقيدوني خرج على جنب الطريق،\nوكنيستنا كمّلت على الطريق الأصلي اللي تسلّمته.'}},
+ msg:'الطريق اتقسم 🪨\nبص على اليمين: طريق حجري فرعي خرج من جنب الصخرة — ده الفرع الخلقيدوني.\nوكنيستنا كمّلت على الطريق الأصلي اللي تسلّمته.'}},
 {type:'rock',year:'1054م',name:'الانشقاق العظيم',
- intro:'الطريق في الفرع الخلقيدوني وصل لصخرة ثانية سنة 1054م.\nالانقسام هنا جوه الكنائس الخلقيدونية نفسها: بين روما والقسطنطينية.\n⚠️ لاحظ: ده مش على طريقنا القبطي المباشر.',
+ intro:'بص على الطريق الموازي (الفرع الخلقيدوني): وصل لصخرة ثانية سنة 1054م.\nالانقسام هنا جوه الكنائس الخلقيدونية نفسها: بين روما والقسطنطينية.\n⚠️ لاحظ: ده مش على طريقنا القبطي المباشر.',
  qs:[
  {q:'الانشقاق حصل بين مين ومين؟',o:['روما والقسطنطينية','الإسكندرية وأنطاكية','أرمينيا وإثيوبيا','مصر والهند'],a:0,w:'جوه الفرع الخلقيدوني نفسه.'},
  {q:'إيه سبب الخلاف؟',o:['أرض وتجارة','انبثاق الروح القدس، وأولوية روما','لغة الصلاة','شكل المباني'],a:1,w:'سببان رئيسيان: انبثاق الروح القدس، وأولوية روما.'},
  {q:'النتيجة كانت إيه؟',o:['اتحاد كل الكنائس','الكنيسة الكاثوليكية في روما، والكنيسة الأرثوذكسية الشرقية حول القسطنطينية','ظهور البروتستانتية','اختفاء الكنيسة'],a:1,w:'الفرع الخلقيدوني اتقسم لاتنين.'},
  {q:'الانقسام ده حصل على طريقنا القبطي المباشر؟',o:['أيوا، إحنا اتقسمنا هناك','لأ، حصل على فرع خرج أصلاً بعد 451م','الطريقين اتقطعوا','محدش عرف'],a:1,w:'مهم نشوف إن ده حصل على الفرع الخلقيدوني، مش على الطريق القبطي المباشر.'}],
  fork:{branch:'روما ✕ القسطنطينية',
- msg:'الفرع الخلقيدوني اتقسم لاتنين 🪨\nوطريقنا القبطي المباشر مستمر من غير الانقسام ده.'}},
+ msg:'شفت اللي حصل في الطريق الموازي؟ 🪨\nالفرع الخلقيدوني اتقسم لاتنين: طريق روما وطريق القسطنطينية.\nوطريقنا القبطي المباشر مستمر من غير الانقسام ده.'}},
 {type:'rock',year:'1517م',name:'الإصلاح البروتستانتي',
- intro:'القرن السادس عشر: ظهرت صخرة جديدة جوه الكنيسة الكاثوليكية.\nاعتراضات وثورات بدأها مارتن لوثر في سياق تاريخي معقد.\nمن جانب الصخرة خرجت فروع كثيرة…',
+ intro:'بص على طريق روما (جوه الفرع الخلقيدوني): في القرن السادس عشر ظهرت صخرة جديدة.\nاعتراضات وثورات بدأها مارتن لوثر في سياق تاريخي معقد.\nمن جانب الصخرة خرجت فروع كثيرة…',
  qs:[
  {q:'مين اللي بدأ حركة الإصلاح؟',o:['مارتن لوثر','القديس كيرلس','أثناسيوس الرسولي','غريغوريوس اللاهوتي'],a:0,w:'بدأها مارتن لوثر في سياق تاريخي معقد.'},
  {q:'الاعتراضات كانت جوه أنهي كنيسة؟',o:['الكنيسة الكاثوليكية','الكنيسة القبطية','الأرثوذكسية الشرقية','كنيسة الهند'],a:0,w:'الاعتراضات كانت جوه الكنيسة الكاثوليكية.'},
  {q:'إيه النتيجة؟',o:['ظهور طوائف بروتستانتية متعددة وفروع كثيرة','رجوع كل الفروع لوحدة كاملة','إلغاء الكتاب المقدس','اختفاء الأسرار في كل مكان'],a:0,w:'الفروع كثرت جداً، ومعها تغيّر في فهم التقليد والكهنوت والأسرار في اتجاهات كثيرة.'},
  {q:'إيه الدرس اللي نتعلمه؟',o:['كلما ابتعد الفرع عن الكنيسة الواحدة والتقليد الرسولي والأسرار، كثرت الفروع والتفسيرات الخاصة','الفروع الكثيرة دليل وحدة','التقليد مالوش لازمة','الأسرار انتهت'],a:0,w:'لذلك الأمانة للطريق المستقيم هي اللي بتحفظ الوحدة.'}],
  fork:{branch:'فروع بروتستانتية كثيرة',
- msg:'الفروع كثرت جداً 🪨\nلكن الطريق الأصلي اللي تسلّمناه… ما اتقطعش.'}}
+ msg:'شفت الفروع الصغيرة اللي خرجت من طريق روما؟ 🪨\nالفروع كثرت جداً…\nلكن الطريق الأصلي اللي تسلّمناه — طريقنا — ما اتقطعش.'}}
 ];
 const ENDING=[
  {t:'تسليم الوديعة',x:'وصلنا نهاية الطريق في الخريطة…\nالآباء المدافعون — ألكسندروس، أثناسيوس، غريغوريوس، وكيرلس — يسلّمون رسالة الإيمان المستقيم لكنيستنا القبطية الأرثوذكسية غير الخلقيدونية اليوم، لاستكمال مسيرة حماية الإيمان.\nمش بروح كبرياء… بروح شكر ومسؤولية.'},
  {t:'إيه معنى «أرثوذكسية»؟',x:'Orthos = مستقيم أو صحيح\nDoxa = إيمان أو تمجيد أو عقيدة\n\nيبقى أرثوذكسية = الإيمان المستقيم:\nالرأي السليم في الله، اللي يقود لعبادة مستقيمة.\nالأرثوذكسية مش مجرد اسم طائفة… هي أمانة للطريق اللي تسلّمناه.'},
  {t:'محبة + أمانة',x:'مع أصحابنا من الطوايف التانية:\n❤️ محبة: بلا سخرية، بلا إدانة أشخاص، بلا تعالي، وصلاة لأجل الجميع.\n🛡️ أمانة: نعرف إيماننا، نتمسك بقانون الإيمان والأسرار والتقليد الرسولي، ونسأل الكنيسة قبل أي تعليم.\n\n«إيمان لا يهتز، مع محبة لا تسقط أبداً.»'},
  {t:'الطريق مستمر',x:'الإيمان ما بدأش بينا…\nسبقنا فيه المسيح والرسل والآباء والشهداء والقديسون.\nمسؤوليتنا مش إننا نكون قُساة ولا مائعين:\nمسؤوليتنا نحفظ ما تسلّمناه… ونعيشه بمحبة.\n\n«رب واحد، إيمان واحد، معمودية واحدة» (أف 4: 5)'}];
-const INTRO={t:'بداية الطريق',x:'تخيّل إننا واقفين عند بداية طريق طويل جداً…\nالطريق ده بدأ من السيد المسيح نفسه، واتسلّم للرسل، والرسل سلّموه للكنيسة.\n\nإحنا مش هنا عشان نحفظ أسماء وسنين — إحنا داخلين رحلة.\nكل شوية هتلاقي بوابة زمنية مكتوب عليها سنة، وعند كل بوابة هيظهر سؤال خطير… والكنيسة لازم ترد.\n\nالطريق المستقيم مش معناه إن مفيش مشاكل؛ الطريق عدّى على بوابات وصخور وفروع كثيرة.\nلكن المهم: الطريق الأصلي لم ينقطع.'};
+const INTRO={t:'بداية الطريق',x:'تخيّل إننا واقفين عند بداية طريق طويل جداً… طريق حجري قديم، بدأ من السيد المسيح نفسه، واتسلّم للرسل، والرسل سلّموه للكنيسة.\n\nإحنا مش هنا عشان نحفظ أسماء وسنين — إحنا داخلين رحلة.\nكل شوية هتلاقي بوابة زمنية مكتوب عليها سنة، واقف عندها المهرطق والمدافع… والكنيسة لازم ترد.\n\nالطريق المستقيم مش معناه إن مفيش مشاكل؛ الطريق عدّى على بوابات وصخور وفروع كثيرة.\nلكن المهم: الطريق الأصلي لم ينقطع.'};
 
 /* ---------------- Canvas ---------------- */
 const cv=document.getElementById('game'),cx=cv.getContext('2d');
-let W=innerWidth,H=innerHeight,DPR=Math.min(devicePixelRatio||1,2);
-function resize(){W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio||1,2);cv.width=W*DPR;cv.height=H*DPR;cx.setTransform(DPR,0,0,DPR,0,0);}
+let W=innerWidth,H=innerHeight,DPR=1;
+function resize(){W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio||1,isTouch?1.5:2);
+ cv.width=W*DPR;cv.height=H*DPR;cx.setTransform(DPR,0,0,DPR,0,0);}
 resize();addEventListener('resize',resize);
-cv.addEventListener('touchmove',e=>e.preventDefault(),{passive:false}); /* منع سحب المتصفح على الـcanvas */
+cv.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
 
-const SEG=200, ROAD_W=2100, CAM_H=1150, CAM_D=0.84, DRAW=120;
+const SEG=200, ROAD_W=2100, CAM_H=1150, CAM_D=0.84;
+let DRAW=isTouch?85:120;
+const STONE_N=isTouch?24:45;
 const MAXS=15000, ACCEL=9000, BRAKE=15000, STEER=1.6;
 let road=[];
 
 let seed=7;function rnd(){seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;}
 
 const G1=270,G2=560,G3=850,R1=1150,R2=1450,R3=1730,END=2010,N=2130;
+
+/* ---------------- Fork roads (geometry) ---------------- */
+const RW=ROAD_W;
+function fkOffW(fk,t){return fk.base+fk.dir*fk.spread*Math.pow(Math.min(t,1),0.85);}
+const F1={at:3,on:false,start:R1,L:END-R1,dir:1,base:0,spread:RW*2.3,w:0.8,fade:false};
+const bR2=fkOffW(F1,(R2-R1)/F1.L);
+const F2={at:4,on:false,start:R2,L:520,dir:1,base:bR2,spread:RW*1.9,w:0.55,fade:true};
+const F3={at:4,on:false,start:R2,L:END-R2,dir:1,base:bR2,spread:RW*0.55,w:0.62,fade:false};
+const bR3=fkOffW(F3,(R3-R2)/F3.L);
+const F4=[0.7,1.3,1.9].map(s=>({at:5,on:false,start:R3,L:300,dir:1,base:bR3,spread:RW*s,w:0.30,fade:true}));
+const FORKS=[F1,F2,F3,...F4];
+
 function buildTrack(){
  road=[];for(let i=0;i<N;i++)road.push({i,curve:0,y:0,sprites:[]});
  const curvy=[[70,200,.6],[210,258,-.5],[360,540,.55],[580,830,-.5],[880,1120,.5],[1190,1420,-.55],[1490,1700,.5],[1770,1980,-.4]];
  for(const[a,b,c]of curvy)for(let i=a;i<=b;i++)road[i].curve=c;
  for(let i=150;i<N;i++)road[i].y=Math.sin(i*0.011)*300+Math.sin(i*0.004+2)*220;
  road[G1].gate=0;road[G2].gate=1;road[G3].gate=2;
- road[R1].rock=0;road[R2].rock=1;road[R3].rock=2;
- for(let i=18;i<N-6;i+=(5+Math.floor(rnd()*7))){
-   const side=rnd()<.5?-1:1,off=side*(1.5+rnd()*2.4);
+ road[R1].rock=0; /* صخرة 451 على طرف طريقنا */
+ /* صخور الانقسامات التالية على الطريق الموازي */
+ road[R2].sprites.push({kind:'frock',mIdx:1,off:bR2/RW});
+ road[R3].sprites.push({kind:'frock',mIdx:2,off:bR3/RW});
+ /* لافتات الفروع */
+ road[R1+80].sprites.push({kind:'sign',text:'الفرع الخلقيدوني (روما والقسطنطينية)',off:fkOffW(F1,80/F1.L)/RW+0.55});
+ road[R2+70].sprites.push({kind:'sign',text:'القسطنطينية',off:fkOffW(F2,70/F2.L)/RW+0.5});
+ road[R2+70].sprites.push({kind:'sign',text:'روما',off:fkOffW(F3,70/F3.L)/RW+0.5});
+ road[R3+60].sprites.push({kind:'sign',text:'طوايف بروتستانتية كثيرة',off:fkOffW(F4[1],60/F4[1].L)/RW+0.5});
+ road[26].sprites.push({kind:'sign',text:'طريق الإيمان المستقيم',off:0});
+ /* نخيل وصخور على الجانبين */
+ for(let i=40;i<N-6;i+=(5+Math.floor(rnd()*7))){
+   const side=rnd()<.5?-1:1,off=side*(1.6+rnd()*2.4);
    const kind=rnd()<.62?'palm':(rnd()<.5?'stone':'bush');
    road[i].sprites.push({kind,off,ph:rnd()*6.28});
  }
+ /* كرات النور */
  const orbs=[];
- const legs=[[40,G1],[G1+40,G2],[G2+40,G3],[G3+40,R1],[R1+40,R2],[R2+40,R3],[R3+40,END-8]];
+ const legs=[[60,G1],[G1+40,G2],[G2+40,G3],[G3+40,R1],[R1+40,R2],[R2+40,R3],[R3+40,END-8]];
  for(const[a,b]of legs)for(let k=0;k<6;k++){
    const i=Math.max(5,a+Math.floor((b-a)*(k+0.5)/6+rnd()*10-5));
    orbs.push({seg:i,off:(rnd()*1.4-0.7),z:i*SEG,taken:false,ph:rnd()*6.28});
@@ -256,8 +300,8 @@ const MZ=[G1,G2,G3,R1,R2,R3].map(s=>s*SEG), CHZ=END*SEG;
 const MSTATE=MILESTONES.map(()=>({done:false,open:0,openT:-1,wrong:0,stars:0}));
 
 /* ---------------- Player ---------------- */
-const player={z:2400,x:0,v:0,bob:0};   /* بداية آمنة بعد الكاميرا */
-let camZ=0,shake=0,curveNow=0;
+const player={z:2400,x:0,v:0,bob:0};
+let camZ=0,shake=0,curveNow=0,lookAmt=0,lookT=0,autoWalk=false;
 let light=60,stars=0,tGlobal=0,state='title',quizIdx=-1,qi=0,wrongHere=0;
 const dust=[],floats=[];
 
@@ -285,22 +329,25 @@ addEventListener('keydown',e=>{keys[e.code]=true;if(['ArrowUp','ArrowDown','Spac
 addEventListener('keyup',e=>keys[e.code]=false);
 const stick={active:false,id:-1,bx:0,by:0,x:0,y:0};
 const stickEl=document.getElementById('stick'),nub=document.getElementById('nub');
-function homeStick(){stickEl.style.left='22px';stickEl.style.top='auto';stickEl.style.bottom='calc(26px + env(safe-area-inset-bottom))';}
-function setStick(cx0,cy0){stickEl.style.bottom='auto';stickEl.style.left=(cx0-60)+'px';stickEl.style.top=(cy0-60)+'px';}
+function homeStick(){stickEl.style.left='20px';stickEl.style.top='auto';stickEl.style.bottom='calc(24px + env(safe-area-inset-bottom))';}
+function setStick(cx0,cy0){stickEl.style.bottom='auto';stickEl.style.left=(cx0-70)+'px';stickEl.style.top=(cy0-70)+'px';}
 addEventListener('pointerdown',e=>{auInit();if(state!=='play')return;
- if(e.target.closest&&e.target.closest('.ov'))return;
+ if(e.target.closest&&(e.target.closest('.ov')||e.target.closest('button')))return;
  if(e.cancelable)e.preventDefault();
  stick.active=true;stick.id=e.pointerId;stick.bx=e.clientX;stick.by=e.clientY;stick.x=0;stick.y=0;setStick(e.clientX,e.clientY);});
 addEventListener('pointermove',e=>{if(!stick.active||e.pointerId!==stick.id)return;
  let dx=e.clientX-stick.bx,dy=e.clientY-stick.by;const m=Math.hypot(dx,dy);
- if(m>52){dx*=52/m;dy*=52/m;}stick.x=dx/52;stick.y=dy/52;
+ if(m>60){dx*=60/m;dy*=60/m;}stick.x=dx/60;stick.y=dy/60;
  nub.style.transform=`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`;});
 function endStick(e){if(stick.active&&e.pointerId===stick.id){stick.active=false;stick.x=0;stick.y=0;homeStick();nub.style.transform='translate(-50%,-50%)';}}
 addEventListener('pointerup',endStick);addEventListener('pointercancel',endStick);
 cv.addEventListener('contextmenu',e=>e.preventDefault());
+const walkBtn=document.getElementById('walkBtn');
+function updateWalkBtn(){walkBtn.classList.toggle('on',autoWalk);walkBtn.innerHTML=autoWalk?'🚶<br>ماشي':'⏸<br>واقف';}
+walkBtn.onclick=()=>{auInit();autoWalk=!autoWalk;updateWalkBtn();};
 
 /* ---------------- Helpers ---------------- */
-function groundY(z){const i=((Math.floor(z/SEG))%N+N)%N,f=((z%SEG)+SEG)%SEG/SEG;return road[i].y*(1-f)+road[(i+1)%N].y*f;}
+function groundY(z){const i=((Math.floor(z/SEG))%N+N)%N,f=(((z%SEG)+SEG)%SEG)/SEG;return road[i].y*(1-f)+road[(i+1)%N].y*f;}
 function proj(wx,wy,wz,camXv,camYv,camZv){const dz=wz-camZv;if(dz<60)return null;
  const s=CAM_D/dz;return{x:W/2+s*(wx-camXv)*W/2,y:H/2-s*(wy-camYv)*H/2,s,K:s*W/2};}
 const clamp=(v,a,b)=>v<a?a:v>b?b:v, lerp=(a,b,t)=>a+(b-a)*t;
@@ -327,40 +374,86 @@ function ridge(base,amp,col,off,f,al){cx.fillStyle=col;cx.globalAlpha=al+.5;cx.b
  for(let x=0;x<=W;x+=8){const t=(x+off)*0.004*f;const y=base-(Math.sin(t)*.55+Math.sin(t*2.7+1.3)*.3+Math.sin(t*5.1)*.15)*amp*2;cx.lineTo(x,y);}
  cx.lineTo(W,H);cx.closePath();cx.fill();cx.globalAlpha=1;}
 
-/* ---------------- Road ---------------- */
+/* ---------------- Paving (ancient stone) ---------------- */
+const STONES=['#a8a094','#a19989','#aca393'];
+const SAND=[211,178,130];
+function stoneColor(i){return STONES[(i*7+((i>>2)%3))%3];}
+function stoneJoints(ax,ay,aw,bx,by,bw,idx,aMul){
+ cx.lineWidth=Math.max(1,aw*0.006);
+ cx.strokeStyle=`rgba(78,68,56,${0.55*aMul})`;
+ for(let r=1;r<3;r++){const t=r/3,y=lerp(ay,by,t),x=lerp(ax,bx,t),w=lerp(aw,bw,t);
+  cx.beginPath();cx.moveTo(x-w,y);cx.lineTo(x+w,y);cx.stroke();}
+ for(let r=0;r<3;r++){
+  const t0=r/3,t1=(r+1)/3;
+  for(let c=1;c<3;c++){
+   let f=(c/3)*2-1; f+=((r+idx)%2?0.22:-0.22);
+   const x0=lerp(ax,bx,t0)+f*lerp(aw,bw,t0),y0=lerp(ay,by,t0);
+   const x1=lerp(ax,bx,t1)+f*lerp(aw,bw,t1),y1=lerp(ay,by,t1);
+   cx.beginPath();cx.moveTo(x0,y0);cx.lineTo(x1,y1);cx.stroke();
+  }
+ }
+}
+function fkColor(fk,t){
+ const base=[164,154,134],sand=[201,173,128],m=Math.min(1,t*0.65+(fk.fade?0.2:0));
+ const r=lerp(base[0],sand[0],m)|0,g=lerp(base[1],sand[1],m)|0,b=lerp(base[2],sand[2],m)|0;
+ return `rgb(${r},${g},${b})`;
+}
+
+/* ---------------- Road render ---------------- */
 const FOG=[242,224,178];
 function renderRoad(){
  camZ=Math.max(0,player.z-1700);
- const camX=player.x*ROAD_W,camY=CAM_H+groundY(player.z)+Math.sin(player.bob)*6;
- const baseIdx=((Math.floor(camZ/SEG))%N+N)%N, baseF=((camZ%SEG)+SEG)%SEG/SEG;
+ const camX=player.x*ROAD_W+lookAmt*ROAD_W*1.7;
+ const camY=CAM_H+groundY(player.z)+Math.sin(player.bob)*6;
+ const baseIdx=((Math.floor(camZ/SEG))%N+N)%N, baseF=(((camZ%SEG)+SEG)%SEG)/SEG;
  let maxy=H,x=0,dx=-(road[baseIdx].curve*baseF);
  curveNow=road[baseIdx].curve;
  const vis=[];
  for(let n=0;n<DRAW;n++){
   const i=(baseIdx+n)%N,seg=road[i];if(!seg)continue;
   const offX1=x,offX2=x+dx;x+=dx;dx+=seg.curve;
-  const z1=i*SEG,z2=z1+SEG;
-  const p1=proj(offX1,seg.y,z1,camX,camY,camZ),p2=proj(offX2,road[(i+1)%N].y,z2,camX,camY,camZ);
+  const z1=i*SEG,z2=z1+SEG,y1=seg.y,y2=road[(i+1)%N].y;
+  const p1=proj(offX1,y1,z1,camX,camY,camZ),p2=proj(offX2,y2,z2,camX,camY,camZ);
   if(!p1||!p2){seg.sc=null;continue;}
   seg.sc={x1:p1.x,y1:p1.y,w1:p1.s*ROAD_W*W/2,K1:p1.K,x2:p2.x,y2:p2.y,w2:p2.s*ROAD_W*W/2,K2:p2.K,fog:Math.pow(n/DRAW,1.7),z1,z2};
   if(p2.y>=maxy||z2<=camZ)continue;
+  /* sand */
+  cx.fillStyle=(Math.floor(i/3)%2)?'#d3b282':'#cba978';
+  cx.fillRect(0,p2.y,W,p1.y-p2.y+1);
+  /* stone curbs */
   const alt=Math.floor(i/3)%2;
-  cx.fillStyle=alt?'#d3b282':'#cba978';cx.fillRect(0,p2.y,W,p1.y-p2.y+1);
-  quad(p1.x-p1.w1*1.14,p1.y,p1.x-p1.w1,p1.y,p2.x-p2.w2,p2.y,p2.x-p2.w2*1.14,p2.y,alt?'#a8977e':'#9c8b73');
-  quad(p1.x+p1.w1,p1.y,p1.x+p1.w1*1.14,p1.y,p2.x+p2.w2*1.14,p2.y,p2.x+p2.w2,p2.y,alt?'#a8977e':'#9c8b73');
-  quad(p1.x-p1.w1,p1.y,p1.x+p1.w1,p1.y,p2.x+p2.w2,p2.y,p2.x-p2.w2,p2.y,alt?'#c0b096':'#b7a78d');
-  if(i%2)quad(p1.x-p1.w1*.09,p1.y,p1.x+p1.w1*.09,p1.y,p2.x+p2.w2*.09,p2.y,p2.x-p2.w2*.09,p2.y,'rgba(90,75,55,.18)');
+  quad(p1.x-p1.w1*1.16,p1.y,p1.x-p1.w1,p1.y,p2.x-p2.w2,p2.y,p2.x-p2.w2*1.16,p2.y,alt?'#8d8272':'#7f7566');
+  quad(p1.x+p1.w1,p1.y,p1.x+p1.w1*1.16,p1.y,p2.x+p2.w2*1.16,p2.y,p2.x+p2.w2,p2.y,alt?'#8d8272':'#7f7566');
+  /* paved surface */
+  quad(p1.x-p1.w1,p1.y,p1.x+p1.w1,p1.y,p2.x+p2.w2,p2.y,p2.x-p2.w2,p2.y,stoneColor(i));
+  if(n<STONE_N)stoneJoints(p1.x,p1.y,p1.w1,p2.x,p2.y,p2.w2,i,1-n/STONE_N);
+  if(i%2)quad(p1.x-p1.w1*.09,p1.y,p1.x+p1.w1*.09,p1.y,p2.x+p2.w2*.09,p2.y,p2.x-p2.w2*.09,p2.y,'rgba(70,60,45,.14)');
+  /* fork roads */
+  for(const fk of FORKS){
+   if(!fk.on||i<fk.start||i>=fk.start+fk.L)continue;
+   const t1=(i-fk.start)/fk.L,t2=(i+1-fk.start)/fk.L;
+   const o1=fkOffW(fk,t1),o2=fkOffW(fk,t2);
+   const f1=proj(offX1+o1,y1,z1,camX,camY,camZ),f2=proj(offX2+o2,y2,z2,camX,camY,camZ);
+   if(!f1||!f2)continue;
+   const w1f=f1.s*ROAD_W*fk.w*(1-t1*0.25)*W/2,w2f=f2.s*ROAD_W*fk.w*(1-t2*0.25)*W/2;
+   const fade=fk.fade?clamp(1-(t1-0.55)/0.45,0,1):1;
+   cx.globalAlpha=fade;
+   quad(f1.x-w1f,f1.y,f1.x+w1f,f1.y,f2.x+w2f,f2.y,f2.x-w2f,f2.y,fkColor(fk,t1));
+   if(n<STONE_N*0.6)stoneJoints(f1.x,f1.y,w1f,f2.x,f2.y,w2f,i,fade*(1-n/(STONE_N*0.6)));
+   cx.globalAlpha=1;
+  }
+  /* milestone sprites */
   if(seg.gate!==undefined||seg.rock!==undefined)vis.push({z:z1,i});
-  if(seg.forkData)vis.push({z:z1,i,fork:1});
+  /* fog */
   const f=seg.sc.fog*.85;
   if(f>.02){cx.fillStyle=`rgba(${FOG[0]},${FOG[1]},${FOG[2]},${f})`;cx.fillRect(0,p2.y,W,p1.y-p2.y+1);}
   maxy=p2.y;
  }
+ /* scenery & orbs */
  for(let n=DRAW-1;n>=0;n--){
   const i=(baseIdx+n)%N,seg=road[i];if(!seg||!seg.sc)continue;
-  for(const sp of seg.sprites){
+  for(const sp of seg.sprites)
    vis.push({z:seg.sc.z1+SEG*.5,x:lerp(seg.sc.x1,seg.sc.x2,.5)+sp.off*lerp(seg.sc.w1,seg.sc.w2,.5),y:lerp(seg.sc.y1,seg.sc.y2,.5),K:lerp(seg.sc.K1,seg.sc.K2,.5),sp,fog:seg.sc.fog});
-  }
  }
  for(const o of orbs){if(o.taken)continue;const si=((Math.floor(o.z/SEG))%N+N)%N,seg=road[si];
   if(!seg.sc||seg.sc.z2<camZ)continue;
@@ -369,7 +462,7 @@ function renderRoad(){
  vis.sort((a,b)=>b.z-a.z);
  for(const v of vis){
   const al=1-clamp((v.fog-.72)/.28,0,1)*.85;cx.globalAlpha=al;
-  if(v.sp)drawScenery(v);else if(v.orb)drawOrb(v);else if(v.fork)drawFork(v.i);else drawMilestone(v.i);
+  if(v.sp)drawScenery(v);else if(v.orb)drawOrb(v);else drawMilestone(v.i);
   cx.globalAlpha=1;
  }
 }
@@ -377,8 +470,22 @@ function quad(x1,y1,x2,y2,x3,y3,x4,y4,col){cx.fillStyle=col;cx.beginPath();cx.mo
 
 /* ---------------- Scenery ---------------- */
 function shadow(x,y,w){cx.fillStyle='rgba(60,40,20,.30)';cx.beginPath();cx.ellipse(x,y,w*.42,w*.12,0,0,7);cx.fill();}
+function plaque(x,y,w,h,txt,K,dark){
+ cx.fillStyle=dark?'#4a3a3a':'#5c4326';rr(x-w/2,y-h,w,h,6*K);cx.fill();
+ cx.strokeStyle=dark?'#8a6a6a':'#c9a25a';cx.lineWidth=Math.max(1,8*K);rr(x-w/2,y-h,w,h,6*K);cx.stroke();
+ cx.fillStyle=dark?'#f0d0d0':'#ffd98a';cx.textAlign='center';cx.textBaseline='middle';
+ cx.font=`900 ${Math.max(9,h*.5)}px Cairo,sans-serif`;
+ cx.fillText(txt,x,y-h/2);
+}
+function rr(x,y,w,h,r){r=Math.min(r,w/2,h/2);cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function drawSign(x,y,K,text){
+ cx.fillStyle='#5c4326';cx.fillRect(x-18*K,y-1000*K,36*K,1000*K);
+ plaque(x,y-1000*K,Math.max(1400*K,text.length*240*K),300*K,text,K,false);
+}
 function drawScenery(v){
  const {x,y,K,sp}=v;
+ if(sp.kind==='sign'){drawSign(x,y,K,sp.text);return;}
+ if(sp.kind==='frock'){drawRockCluster(x,y,K*ROAD_W,K,sp.mIdx);return;}
  if(sp.kind==='palm'){
   const h=2300*K,lean=Math.sin(sp.ph)*.18;
   shadow(x,y,h*.5);
@@ -410,21 +517,52 @@ function drawOrb(v){
  cx.fillStyle='#fff2c2';cx.beginPath();cx.arc(x,yy,r*.55,0,7);cx.fill();
 }
 
-/* ---------------- Milestones ---------------- */
-function plaque(x,y,w,h,txt,K){
- cx.fillStyle='#5c4326';rr(x-w/2,y-h,w,h,6*K);cx.fill();
- cx.strokeStyle='#c9a25a';cx.lineWidth=Math.max(1,8*K);rr(x-w/2,y-h,w,h,6*K);cx.stroke();
- cx.fillStyle='#ffd98a';cx.textAlign='center';cx.textBaseline='middle';
- cx.font=`900 ${Math.max(9,h*.52)}px Cairo,sans-serif`;
- cx.fillText(txt,x,y-h/2);
+/* ---------------- Figures (world) ---------------- */
+function shade(hex,amt){const n=parseInt(hex.slice(1),16);let r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt;
+ return `rgb(${clamp(r,0,255)},${clamp(g,0,255)},${clamp(b,0,255)})`;}
+function drawFigure(x,y,h,phase,robe,scarf,lean,isMain,halo){
+ cx.save();cx.translate(x,y);cx.rotate(lean*.1);
+ shadow(0,0,h*.34);
+ if(isMain&&light>30){const g=cx.createRadialGradient(0,-h*.5,2,0,-h*.5,h*.9);
+  g.addColorStop(0,`rgba(255,220,130,${light/100*.28})`);g.addColorStop(1,'rgba(255,220,130,0)');
+  cx.fillStyle=g;cx.beginPath();cx.arc(0,-h*.5,h*.9,0,7);cx.fill();}
+ const sw=Math.sin(phase)*h*.05,bob=Math.abs(Math.sin(phase))*h*.03;
+ cx.translate(0,-bob);
+ const rg=cx.createLinearGradient(-h*.16,0,h*.16,0);
+ rg.addColorStop(0,shade(robe,-25));rg.addColorStop(.45,robe);rg.addColorStop(1,shade(robe,-35));
+ cx.fillStyle=rg;cx.beginPath();
+ cx.moveTo(-h*.15-sw*.4,0);cx.quadraticCurveTo(-h*.19,-h*.45,-h*.11,-h*.62);
+ cx.quadraticCurveTo(0,-h*.68,h*.11,-h*.62);cx.quadraticCurveTo(h*.19,-h*.45,h*.15+sw*.4,0);cx.closePath();cx.fill();
+ cx.fillStyle='#e8c49a';cx.beginPath();cx.arc(0,-h*.72,h*.085,0,7);cx.fill();
+ cx.fillStyle=scarf;cx.beginPath();cx.arc(0,-h*.735,h*.095,Math.PI*.95,Math.PI*2.05);
+ cx.quadraticCurveTo(h*.13,-h*.6,h*.10+sw*.3,-h*.44);cx.lineTo(-h*.10-sw*.3,-h*.44);
+ cx.quadraticCurveTo(-h*.13,-h*.6,-h*.09,-h*.72);cx.closePath();cx.fill();
+ if(halo){cx.strokeStyle='rgba(255,215,110,.9)';cx.lineWidth=Math.max(1.5,h*.02);
+  cx.beginPath();cx.arc(0,-h*.72,h*.125,0,7);cx.stroke();}
+ cx.strokeStyle='#6a4a25';cx.lineWidth=Math.max(1.5,h*.028);cx.lineCap='round';
+ cx.save();cx.translate(h*.17,-h*.45);cx.rotate(.12+sw*.004);
+ cx.beginPath();cx.moveTo(0,h*.4);cx.lineTo(0,-h*.38);cx.stroke();
+ if(isMain){cx.beginPath();cx.moveTo(-h*.06,-h*.3);cx.lineTo(h*.06,-h*.3);cx.stroke();} /* صليب العصا */
+ cx.restore();
+ cx.restore();
 }
-function rr(x,y,w,h,r){r=Math.min(r,w/2,h/2);cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+const GATE_FIG=[
+ {h:'أريوس',d:'ألكسندروس + أثناسيوس'},
+ {h:'مقدونيوس',d:'غريغوريوس اللاهوتي'},
+ {h:'نسطور',d:'كيرلس الكبير'}];
+function drawWorldFigure(x,y,K,robe,scarf,halo,name,dark){
+ const h=1550*K;
+ drawFigure(x,y,h,0,robe,scarf,dark?-0.5:0,false,halo);
+ plaque(x,y-h-50*K,Math.max(900*K,name.length*260*K),270*K,name,K,dark);
+}
+
+/* ---------------- Milestones ---------------- */
 function drawMilestone(i){
  const seg=road[i];if(!seg||!seg.sc)return;
  const {x1,y1,w1,K1}=seg.sc;
  const st=MSTATE[seg.gate!==undefined?seg.gate:(3+seg.rock)];
  if(seg.gate!==undefined)drawGate(x1,y1,w1,K1,seg.gate,st);
- else drawRockCluster(x1,y1,w1,K1,seg.rock);
+ else drawRockCluster(x1+w1*0.62,y1,w1,K1,seg.rock);
 }
 function drawGate(cxr,y,hw,K,idx,st){
  const pw=300*K,ph=1600*K,px=hw*1.06;
@@ -449,10 +587,14 @@ function drawGate(cxr,y,hw,K,idx,st){
  cx.fillStyle='#d9c9a8';for(let s=0;s<6;s+=2)cx.fillRect(bw*s/6+8*K,-bh+8*K,bw/6-16*K,bh-16*K);
  cx.fillStyle='#c9a25a';cx.fillRect(bw*.48,-bh-10*K,bw*.05,bh+20*K);
  cx.restore();
- plaque(cxr,y-ph-260*K,1300*K,320*K,MILESTONES[idx].year,K);
+ plaque(cxr,y-ph-260*K,1300*K,320*K,MILESTONES[idx].year,K,false);
+ /* المهرطق والمدافع */
+ const F=GATE_FIG[idx];
+ drawWorldFigure(cxr-hw*0.52,y,K,'#3a3246','#241f30',false,F.h,true);
+ drawWorldFigure(cxr+hw*0.52,y,K,'#e8e2d2','#c9973b',true,F.d,false);
 }
-function drawRockCluster(cxr,y,hw,K,idx){
- const x=cxr+hw*.62;shadow(x,y,hw*.55);
+function drawRockCluster(x,y,hw,K,mIdx){
+ shadow(x,y,hw*.55);
  const cols=['#8f8272','#7c7164','#9a8d7c'];
  for(let b=0;b<4;b++){
   const bx=x+(b-1.5)*hw*.14,by=y-Math.abs(Math.sin(b*2.7))*hw*.06,s=hw*(.30-(b%2)*.08);
@@ -461,24 +603,12 @@ function drawRockCluster(cxr,y,hw,K,idx){
   cx.strokeStyle='rgba(40,30,20,.4)';cx.lineWidth=Math.max(1,10*K);
   cx.beginPath();cx.moveTo(bx-s*.3,by-s*.8);cx.lineTo(bx+s*.1,by-s*.3);cx.stroke();
  }
- const sx=cxr-hw*.75,sh=900*K;
+ const sx=x-hw*.5,sh=900*K;
  cx.fillStyle='#5c4326';cx.fillRect(sx-20*K,y-sh,40*K,sh);
- plaque(sx,y-sh,1000*K,300*K,MILESTONES[3+idx].year,K);
-}
-function drawFork(i){
- const seg=road[i];if(!seg.sc||!seg.forkData)return;
- const {x1,y1,w1,K1,x2,y2,w2}=seg.sc,fd=seg.forkData;
- for(let t=0;t<1;t+=.125){
-  const o1=fd.dir*(w1*(0.9+t*3.2)),o2=fd.dir*(w1*(0.9+(t+.125)*3.2));
-  const yy1=lerp(y1,y2,t),yy2=lerp(y1,y2,t+.125),ww=w1*(0.28-t*.10);
-  quad(x1+o1-ww,yy1,x1+o1+ww,yy1,x1+o2+ww,yy2,x1+o2-ww,yy2,'rgba(150,132,105,.85)');
- }
- plaque(x1+fd.dir*w1*1.55,y1-350*K1,1900*K1,300*K1,fd.label,K1);
- const sh=`rgba(255,215,120,${.10+Math.sin(tGlobal*3)*.05})`;
- quad(x1-w1*.9,y1,x1+w1*.9,y1,x2+w2*.9,y2,x2-w2*.9,y2,sh);
+ plaque(sx,y-sh,1000*K,300*K,MILESTONES[3+mIdx].year,K,false);
 }
 
-/* ---------------- Church & fathers ---------------- */
+/* ---------------- Church ---------------- */
 function drawChurch(p){
  if(!p)return;const K=p.K,x=p.x,y=p.y;
  const fw=9000*K,fh=4200*K;
@@ -500,6 +630,7 @@ function drawChurch(p){
   cx.moveTo(x+s*fw*.3-fw*.05,y);cx.lineTo(x+s*fw*.3-fw*.05,y-fh*.3);cx.arc(x+s*fw*.3,y-fh*.3,fw*.05,Math.PI,0);cx.lineTo(x+s*fw*.3+fw*.05,y);cx.closePath();cx.fill();
   cx.fillStyle=`rgba(255,210,110,${.5+Math.sin(tGlobal*2+s)*.2})`;cx.beginPath();cx.arc(x+s*fw*.3,y-fh*.3,fw*.032,0,7);cx.fill();}
  const robes=['#5b3d8a','#8a2f2f','#2f5d8a','#3f6b3a'],names=['أثناسيوس','غريغوريوس','ألكسندروس','كيرلس'];
+ cx.textBaseline='alphabetic';
  for(let f=0;f<4;f++){
   const fx=x+(f-1.5)*fw*.24,fh2=1500*K,sw=fw*.075;
   shadow(fx,y+30*K,sw*3);
@@ -513,39 +644,16 @@ function drawChurch(p){
  }
 }
 
-/* ---------------- Player ---------------- */
-function shade(hex,amt){const n=parseInt(hex.slice(1),16);let r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt;
- return `rgb(${clamp(r,0,255)},${clamp(g,0,255)},${clamp(b,0,255)})`;}
-function drawFigure(x,y,h,phase,robe,scarf,lean,isMain){
- cx.save();cx.translate(x,y);cx.rotate(lean*.1);
- shadow(0,0,h*.34);
- if(isMain&&light>30){const g=cx.createRadialGradient(0,-h*.5,2,0,-h*.5,h*.9);
-  g.addColorStop(0,`rgba(255,220,130,${light/100*.28})`);g.addColorStop(1,'rgba(255,220,130,0)');
-  cx.fillStyle=g;cx.beginPath();cx.arc(0,-h*.5,h*.9,0,7);cx.fill();}
- const sw=Math.sin(phase)*h*.05,bob=Math.abs(Math.sin(phase))*h*.03;
- cx.translate(0,-bob);
- const rg=cx.createLinearGradient(-h*.16,0,h*.16,0);
- rg.addColorStop(0,shade(robe,-25));rg.addColorStop(.45,robe);rg.addColorStop(1,shade(robe,-35));
- cx.fillStyle=rg;cx.beginPath();
- cx.moveTo(-h*.15-sw*.4,0);cx.quadraticCurveTo(-h*.19,-h*.45,-h*.11,-h*.62);
- cx.quadraticCurveTo(0,-h*.68,h*.11,-h*.62);cx.quadraticCurveTo(h*.19,-h*.45,h*.15+sw*.4,0);cx.closePath();cx.fill();
- cx.fillStyle='#e8c49a';cx.beginPath();cx.arc(0,-h*.72,h*.085,0,7);cx.fill();
- cx.fillStyle=scarf;cx.beginPath();cx.arc(0,-h*.735,h*.095,Math.PI*.95,Math.PI*2.05);
- cx.quadraticCurveTo(h*.13,-h*.6,h*.10+sw*.3,-h*.44);cx.lineTo(-h*.10-sw*.3,-h*.44);
- cx.quadraticCurveTo(-h*.13,-h*.6,-h*.09,-h*.72);cx.closePath();cx.fill();
- cx.strokeStyle='#6a4a25';cx.lineWidth=Math.max(1.5,h*.028);cx.lineCap='round';
- cx.save();cx.translate(h*.17,-h*.45);cx.rotate(.12+sw*.004);
- cx.beginPath();cx.moveTo(0,h*.4);cx.lineTo(0,-h*.38);cx.stroke();cx.restore();
- cx.restore();
-}
+/* ---------------- Player group ---------------- */
 function drawPlayer(){
  if(state==='ending-cine')return;
- const h=H*.315,lat=clamp((keys.ArrowRight||keys.KeyD?1:0)-(keys.ArrowLeft||keys.KeyA?1:0)+(stick.active?stick.x:0),-1,1);
- const px=W/2+curveNow*-40+lat*W*.03,py=H*.92,ph=player.bob*2.2;
+ const h=Math.max(140,H*(isTouch?0.36:0.32));
+ const lat=clamp((keys.ArrowRight||keys.KeyD?1:0)-(keys.ArrowLeft||keys.KeyA?1:0)+(stick.active?stick.x:0),-1,1);
+ const px=W/2+curveNow*-40+lat*W*.03,py=H-(isTouch?H*0.09:H*0.075),ph=player.bob*2.2;
  const lean=lat*.12;
- drawFigure(px-h*.44,py+h*.06,h*.72,ph+.9,'#8a5a3a','#e8d9b8',lean,false);
- drawFigure(px+h*.46,py+h*.08,h*.68,ph+2.4,'#5a6a8a','#d8c8a8',lean,false);
- drawFigure(px,py,h,ph,'#e8e2d2','#c9973b',lean,true);
+ drawFigure(px-h*.46,py+h*.05,h*.74,ph+.9,'#8a5a3a','#e8d9b8',lean,false,false);
+ drawFigure(px+h*.48,py+h*.07,h*.70,ph+2.4,'#5a6a8a','#d8c8a8',lean,false,false);
+ drawFigure(px,py,h,ph,'#e8e2d2','#c9973b',lean,true,false);
 }
 
 /* ---------------- Particles ---------------- */
@@ -562,11 +670,16 @@ function drawParticles(){
 /* ---------------- Logic ---------------- */
 function update(dt){
  tGlobal+=dt;shift+=curveNow*(player.v/MAXS)*dt*900;
+ lookT=Math.max(0,lookT-dt);
+ const lookTarget=(lookT>0||(state==='quiz'&&quizIdx>=4))?1:0;
+ lookAmt+=(lookTarget-lookAmt)*Math.min(1,dt*1.8);
  if(state!=='play'){player.v=Math.max(0,player.v-BRAKE*dt);player.z+=player.v*dt;player.bob+=player.v*dt*.004;stepParticles(dt);updateGateAnims(dt);return;}
  let fwd=0,lat=0;
  if(keys.ArrowUp||keys.KeyW)fwd=1;if(keys.ArrowDown||keys.KeyS)fwd=.15;
  lat=(keys.ArrowRight||keys.KeyD?1:0)-(keys.ArrowLeft||keys.KeyA?1:0);
- if(stick.active){fwd=Math.max(fwd,clamp(-stick.y,0,1));if(!lat)lat=stick.x;}
+ if(stick.active){fwd=Math.max(fwd,clamp(-stick.y,0,1));if(!lat)lat=stick.x;if(stick.y>0.5)fwd=0.12;}
+ if(autoWalk)fwd=Math.max(fwd,1);
+ if(stick.active&&stick.y>0.5)fwd=0.12;
  const target=fwd*MAXS;
  if(player.v<target)player.v=Math.min(target,player.v+ACCEL*dt);
  else player.v=Math.max(target,player.v-(target<player.v*.3?BRAKE:ACCEL*.8)*dt);
@@ -610,6 +723,7 @@ function refreshHUD(){
  for(let m=0;m<6;m++){const d=document.getElementById('nd'+(m+1));if(d&&MSTATE[m].done)d.classList.add('done');}
  const d=document.getElementById('nd7');if(d&&state==='summary')d.classList.add('done');
  stickEl.style.visibility=(state==='play')?'visible':'hidden';
+ walkBtn.style.display=(state==='play'&&isTouch)?'block':'none';
 }
 
 /* ---------------- Toast / panels ---------------- */
@@ -630,12 +744,15 @@ function openQuiz(m){state='quiz';quizIdx=m;qi=0;wrongHere=0;player.v=0;
  const M=MILESTONES[m];
  document.getElementById('qzYear').textContent=(M.type==='gate'?'بوابة ':'صخرة ')+M.year;
  document.getElementById('qzName').textContent=M.name;
+ document.getElementById('qzChars').innerHTML=M.her?
+  `<div class="chip her">🗣️ الهرطقة: ${M.her}</div><div class="chip def">🛡️ المدافع: ${M.def}</div>`:'';
  const dots=document.getElementById('qzDots');dots.innerHTML='';
  M.qs.forEach(()=>dots.appendChild(document.createElement('i')));
  document.getElementById('qzIntro').classList.remove('hidden');
  document.getElementById('qzBody').classList.add('hidden');
  document.getElementById('qzDone').classList.add('hidden');
  document.getElementById('qzIntroTxt').textContent=M.intro;
+ if(m>=4)lookT=6;
  quizEl.classList.remove('hidden');}
 document.getElementById('qzBegin').onclick=()=>{auInit();
  document.getElementById('qzIntro').classList.add('hidden');
@@ -680,8 +797,8 @@ function finishQuiz(){
   quizEl.classList.add('hidden');
   if(M.type==='gate'){st.openT=0;sfxGate();state='play';toast(M.open,3200);}
   else{state='panel';
-   const dir=(m%2===0)?1:-1;
-   for(let k=6;k<70;k++){const s=road[(Math.floor(MZ[m]/SEG)+k)%N];if(!s.forkData)s.forkData={dir,label:M.fork.branch};}
+   FORKS.forEach(f=>{if(f.at===m)f.on=true;});
+   lookT=m===3?3.5:7;
    showPanel('صخرة '+M.year,M.name,M.fork.msg,'كمّل في الطريق المستقيم ◀',()=>{state='play';toast('إحنا ماشيين على الطريق الأصلي اللي تسلّمناه ✨',3200);});
   }};
 }
@@ -705,13 +822,16 @@ document.getElementById('btnStart').onclick=()=>{auInit();
  document.getElementById('title').classList.add('hidden');
  document.getElementById('hud').classList.remove('hidden');
  showPanel('✛',INTRO.t,INTRO.x,'يلا نمشي ◀',()=>{state='play';
-  document.getElementById('hint').classList.remove('hidden');
-  setTimeout(()=>document.getElementById('hint').style.opacity=0,7000);});};
+  autoWalk=isTouch;updateWalkBtn();
+  const hint=document.getElementById('hint');
+  hint.textContent=isTouch?'المسافرون بيمشوا لوحدهم 🚶 — اسحب يمين/شمال للتوجيه، و⏸ للتوقف':'امشي بالأسهم أو WASD، واجمع كرات النور ✨';
+  hint.classList.remove('hidden');
+  setTimeout(()=>hint.style.opacity=0,8000);});};
 document.getElementById('btnAgain').onclick=()=>location.reload();
 document.getElementById('mute').onclick=e=>{auInit();AU.on=!AU.on;e.target.textContent=AU.on?'🔊':'🔇';
  if(AU.wind)AU.wind.gain.value=AU.on?.05:0;};
 
-/* ---------------- Main loop (محمي من التجمد) ---------------- */
+/* ---------------- Main loop ---------------- */
 let last=performance.now();
 function frame(now){
  const dt=Math.min(.05,(now-last)/1000);last=now;
@@ -721,9 +841,9 @@ function frame(now){
   cx.save();
   if(shake>0)cx.translate((Math.random()-.5)*shake*14,(Math.random()-.5)*shake*10);
   renderRoad();
-  const si=END%N,seg=road[si];
+  const seg=road[END%N];
   if(seg&&seg.sc&&seg.sc.z1>camZ){
-    const p=proj(0,seg.y,si*SEG,player.x*ROAD_W,CAM_H+groundY(player.z),camZ);
+    const p=proj(0,seg.y,(END%N)*SEG,player.x*ROAD_W+lookAmt*ROAD_W*1.7,CAM_H+groundY(player.z),camZ);
     if(p&&p.K>.004)drawChurch({x:seg.sc.x1,y:seg.sc.y1,K:seg.sc.K1});
   }
   drawPlayer();
