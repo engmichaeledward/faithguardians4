@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <meta name="theme-color" content="#080a20" />
+  <title>Neon Rail Rush</title>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <div id="game"></div>
+  <canvas id="fx"></canvas>
+  <div id="vignette"></div>
+  <section id="menu" class="screen active">
+    <div class="brand"><small>SKYLINE DISTRICT</small><h1>NEON<br><span>RAIL RUSH</span></h1><p>Dash the rails. Own the skyline.</p></div>
+    <button class="play pulse" data-action="play">PLAY</button>
+    <div class="menu-stats"><span>◉ <b id="bankCoins">0</b></span><span>BEST <b id="bestScore">0</b></span></div>
+    <nav><button data-panel="characters">RUNNER</button><button data-panel="shop">UPGRADES</button><button data-panel="missions">MISSIONS</button><button data-panel="settings">SETTINGS</button></nav>
+    <div class="control-tip">A D / ← → to move · W / ↑ / SPACE jump · S / ↓ slide · Swipe on mobile</div>
+  </section>
+  <section id="hud" class="hidden">
+    <div class="hud-top"><div><small>SCORE</small><b id="score">0</b></div><div class="mult">×<b id="multiplier">1</b></div><div><small>COINS</small><b>◉ <span id="coins">0</span></b></div></div>
+    <div id="powerHud"></div><div id="toast"></div><div id="pause">Ⅱ</div>
+  </section>
+  <section id="gameover" class="screen modal hidden"><div class="card"><small>RUN COMPLETE</small><h2>Great Run!</h2><div class="results"><div><span>SCORE</span><b id="finalScore">0</b></div><div><span>DISTANCE</span><b id="finalDistance">0 m</b></div><div><span>COINS</span><b id="finalCoins">0</b></div><div><span>BEST</span><b id="finalBest">0</b></div></div><div id="missionRecap"></div><button class="primary" data-action="play">RUN AGAIN</button><button data-action="menu">MAIN MENU</button></div></section>
+  <section id="panel" class="screen modal hidden"><div class="card wide"><button class="close" data-action="close">×</button><h2 id="panelTitle"></h2><div id="panelBody"></div></div></section>
+  <div id="rotateHint">Rotate for a wider view — portrait is fully supported</div>
+  <script type="module" src="/src/game.js"></script>
+</body>
+</html>
